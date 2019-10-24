@@ -45,12 +45,10 @@ def check(namespace, my_var):
 
 
 for string in string_list:
-    command = string.split(' ')
-    cmd = command[0]
-    namespace = command[1]
+    cmd, namespace, arg = string.split()
 
     if cmd == 'add':
-        variable = command[2]
+        variable = arg
         var_list = variables.get(namespace)
 
         if var_list is None:
@@ -59,10 +57,10 @@ for string in string_list:
 
         variables[namespace] = var_list
     elif cmd == 'create':
-        parent = command[2]
+        parent = arg
         parents[namespace] = parent
     elif cmd == 'get':
-        variable = command[2]
+        variable = arg
         print(check(namespace, variable))
     else:
         print('Ошибка')
