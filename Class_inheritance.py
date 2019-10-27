@@ -33,8 +33,6 @@ parents_list = []
 
 # Dictionary with key = class and value = parents of class
 parents_dict = {}
-all_parents = []
-
 
 # import sys
 # sys.stdin = open("input.txt", "r")
@@ -48,12 +46,14 @@ for i in range(int(input())):
 
 
 def get_all_parents(class_name):
+    all_parents = []
     parents = parents_dict.get(class_name)
+
     if parents:
         for parent in parents:
             if parent not in all_parents:
                 all_parents.append(parent)
-                get_all_parents(parent)
+                all_parents.extend(get_all_parents(parent))
     return all_parents
 
 
@@ -90,7 +90,5 @@ for string in input_list:
         parents_dict[class_name] = parents_list
 
 for string in output_list:
-    class_name = string.split()[0]
-    parent = string.split()[1]
-    all_parents = []
+    class_name, parent = string.split()
     print(is_parent(class_name, parent))
