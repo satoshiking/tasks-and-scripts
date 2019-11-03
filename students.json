@@ -1,0 +1,20 @@
+[
+    {
+        "first_name": "Nikita",
+        "last_name": "Samoilov",
+        "scores": [
+            70,
+            80,
+            90
+        ]
+    },
+    {
+        "first_name": "Igor",
+        "last_name": "Smirnof",
+        "scores": [
+            20,
+            30,
+            40
+        ]
+    }
+]
