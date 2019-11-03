@@ -1,20 +1,15 @@
 import itertools
 
 
-"""
 tests = []
-for i in range(int(input())):
-    n = int(input())
-    a = list(map(int, input().split()))
-    tests.append(a)
-
-print()
-print(tests)
-"""
-
-tests= [[2,4,6,8]]
-
 diff = []
+
+# считываем входные данные
+with open("c_in.txt") as f:
+    for i in range(int(f.readline())):
+        n = f.readline().split()
+        a = list(map(int, f.readline().split()))
+        tests.append(a)
 
 
 for a in tests:

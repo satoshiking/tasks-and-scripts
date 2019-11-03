@@ -1,4 +1,5 @@
-# описание задачи смотри в фале "B. Закрытый ключ.txt"
+import random
+# описание задачи смотри в фале "b_description.txt"
 #x, y = map(int, input().split())
 
 # разложение числа на простые множители
@@ -35,17 +36,16 @@ def get_pk_num(x,y):
                 if not is_common_divider(i,int(n/i)):
                     nums.append([i,int(n/i)])
         print(len(nums))
-        print(nums)
+        print("Подходящие пары закрытых ключей [p, k]:", nums)
     else:
         print(0)
 
 
 # testing block
-import random
-for i in range(3):
+for i in range(2):
     a = random.randint(1,10000)
     b = random.randint(1,10000)
 
-    print('testing num=', a, a*b)
+    print('Тестируем числа:', a, a*b)
     get_pk_num(a, a*b)
     print()
