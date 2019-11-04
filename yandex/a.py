@@ -1,3 +1,6 @@
+import sys
+
+
 meal_d = {
     #'блюдо' : [кол-во людей, кол-во ингридиентов, [ [ингридиент, кол-во, ед-ца измерения], [], ..., [] ]],
 }
@@ -16,7 +19,7 @@ ingr_buy = {
 
 price = 0
 
-import sys
+
 sys.stdin = open("a_in.txt", "r")
 
 meal_num = int(input())
