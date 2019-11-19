@@ -49,10 +49,15 @@ class Postamat:
     def is_working(self):
         day = datetime.today().weekday()
         time = datetime.today().strftime("%H:%M")
-        if len(self.working_hours) > day:
-            time_open = self.working_hours[day].get("time_open")
-            time_close = self.working_hours[day].get("time_close")
+        time_open = None
+        time_close = None
 
+        for elem in self.working_hours:
+            if elem.get("dow") == day:
+                time_open = self.working_hours[day].get("time_open")
+                time_close = self.working_hours[day].get("time_close")
+
+        if time_open and time_close:
             if time_open <= time <= time_close:
                 return "Yes"
             else:
