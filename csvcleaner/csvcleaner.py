@@ -3,6 +3,8 @@ import sys
 
 import pandas as pd
 
+INPUT_FILE = 'input.csv'
+
 
 def get_row():
     print("There are {} rows in your csv file in range [0, {}]:".
@@ -34,6 +36,15 @@ def get_column(correct_columns):
     return column
 
 
+def display_grouped(column):
+    df_grouped = df.groupby(column).count()
+    i = 1
+    for row in list(df_grouped.index):
+        print('  ', i, row, ':', df_grouped.loc[row][0])
+        i += 1
+    print()
+
+
 def display_title_bar():
     os.system('clear')
     print("\t**********************************************")
@@ -57,9 +68,20 @@ def get_user_choice():
     print("[9] Sort rows by column value")
     print("[10] Check (and optionally change) column value(s)")
     print("[11] Save cleaned data to CSV file.")
-    print("[q] Quit.")
+    print("[12] Quit.")
 
     return input("What would you like to do? ")
+
+
+def get_case_choice():
+    print("  1. Title case")
+    print("  2. lower case")
+    print("  3. UPPER case")
+    print("  4. Sentense case")
+    choice = input("Enter number to choose function to execute: ")
+    while choice not in '1234':
+        choice = input("Please enter valid number: ")
+    return choice
 
 
 def show_csv():
@@ -68,26 +90,27 @@ def show_csv():
 
 
 def show_csv_as_dict():
-    columns = list(df.columns)
-    df_sorted = df.sort_values(by=columns)
-    print('Data in dictionary format ...\n', df_sorted)
+    df2 = df.to_dict('records')
+    i = 0
+    for row in df2:
+        print(i, ":", row)
+        i += 1
 
 
 def check_duplicates():
     global df
 
-    duplicates = df.duplicated().sum()
-    print("%s duplicate(s) have found." % duplicates)
-
-    if duplicates > 0:
-        choice = 'q'
-        while choice not in 'yYnN':
-            choice = input("Drop duplicates (y/n)? ")
-            if choice in 'yY':
-                df = df.drop_duplicates().reset_index(drop=True)
-                dupicates_new = df.duplicated().sum()
-                print("{} duplicate(s) were droped.".
-                      format(duplicates-dupicates_new))
+    is_duplicats = False
+    df_grouped = df.groupby(list(df.columns))
+    for group in df_grouped.indices:
+        duplicates = list(df_grouped.indices[group])
+        if len(duplicates) > 1:
+            print("rows: {} are the same".format(duplicates))
+            is_duplicats = True
+    if not is_duplicats:
+        print("There is no duplicated rows")
+    print()
+    show_csv_as_dict()
 
 
 def remove_spaces_and_feed():
@@ -95,14 +118,27 @@ def remove_spaces_and_feed():
 
     df[df_obj.columns] = df_obj.apply(lambda x: x.str.strip())
     print("All leading and trailing characters were removed")
-    print('Transformed data ...\n', df)
+    print('Transformed data ...')
+    show_csv_as_dict()
 
 
 def change_case_all_columns():
     global df, df_obj
 
-    df[df_obj.columns] = df_obj.apply(lambda x: x.str.upper())
-    print('Transformed data ...\n', df)
+    choice = get_case_choice()
+    if choice == '1':
+        df[df_obj.columns] = df_obj.apply(lambda x: x.str.title())
+    elif choice == '2':
+        df[df_obj.columns] = df_obj.apply(lambda x: x.str.lower())
+    elif choice == '3':
+        df[df_obj.columns] = df_obj.apply(lambda x: x.str.upper())
+    elif choice == '4':
+        if len(list(df_obj.columns)) > 0:
+            df[df_obj.columns] = df_obj.apply(lambda x: x.str.lower())
+            df[df_obj.columns[0]] = df_obj.apply(lambda x: x.str.title())
+
+    print('Transformed data ...')
+    show_csv_as_dict()
 
 
 def change_case_column():
@@ -112,8 +148,18 @@ def change_case_column():
     correct_columns = list(df.select_dtypes(include=['object']).columns)
     if correct_columns:
         column = get_column(correct_columns)
-        df[column] = df[column].str.upper()
-        print('Transformed data ...\n', df)
+        choice = get_case_choice()
+        if choice == '1':
+            df[column] = df[column].str.title()
+        elif choice == '2':
+            df[column] = df[column].str.lower()
+        elif choice == '3':
+            df[column] = df[column].str.upper()
+        elif choice == '4':
+            df[column] = df[column].str.title()
+
+        print('Transformed data ...')
+        show_csv_as_dict()
     else:
         print('There is no columns with string values to change text case')
 
@@ -129,10 +175,12 @@ def delete_column():
 
 def delete_row():
     global df
+
     row = get_row()
-    df = df.drop(row)
+    df = df.drop(row).reset_index(drop=True)
     print("\nRow %s was deleted" % row)
-    print('Transformed data ...\n', df)
+    print('Transformed data ...')
+    show_csv_as_dict()
 
 
 def update_cell():
@@ -142,7 +190,8 @@ def update_cell():
     value = input("Please enter new cell value: ")
     df.loc[row, column] = value
     print("\n Cell [{}, {}] was updated".format(row, column))
-    print('Transformed data ...\n', df)
+    print('Transformed data ...')
+    show_csv_as_dict()
 
 
 def sort_rows_by_column():
@@ -150,7 +199,31 @@ def sort_rows_by_column():
 
     column = get_column(list(df.columns))
     df_sorted = df.sort_values(by=column)
-    print('Sorted data ...\n', df_sorted)
+    print('Sorted data ...')
+    df2 = df_sorted.to_dict('records')
+    i = 0
+    for row in df2:
+        print(i, ":", row)
+        i += 1
+
+
+def check_column_values():
+    global df
+
+    column = get_column(list(df.columns))
+    display_grouped(column)
+
+    if input("Want to change some value ('y' for yes and otherwise no)? ") == 'y':
+        more = 'y'
+        while more == 'y':
+            old = input("Enter the value in the column to change: ")
+            while old not in list(df.groupby(column).count().index):
+                old = input("Please enter a valid column value: ")
+
+            new = input("Enter the new value: ")
+            df[column] = df.apply(lambda x: new if x[column] == old else x[column], axis=1)
+            display_grouped(column)
+            more = input("Need more changes ('y' for yes and otherwise for no)? ")
 
 
 def save_csv():
@@ -185,13 +258,11 @@ if __name__ == '__main__':
 
         df_obj = df.select_dtypes(['object'])
         display_title_bar()
-        show_csv()
 
         # Set up a loop where users can choose what they'd like to do.
         choice = ''
-        while choice != 'q':
+        while choice != '12':
             choice = get_user_choice()
-            display_title_bar()
 
             if choice == '0':
                 show_csv()
@@ -214,10 +285,10 @@ if __name__ == '__main__':
             elif choice == '9':
                 sort_rows_by_column()
             elif choice == '10':
-                print("don't know")
+                check_column_values()
             elif choice == '11':
                 save_csv()
-            elif choice == 'q':
+            elif choice == '12':
                 quit()
             else:
                 print("\nI didn't understand that choice.\n")
