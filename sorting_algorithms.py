@@ -24,10 +24,26 @@ def qsort(list_to_sort):
     if len(list_to_sort) < 2:
         return list_to_sort
     else:
-        opornii = list_to_sort[len(list_to_sort) // 2]
-        lower = [i for i in list_to_sort if i < opornii]
+        opornii = list_to_sort.pop(len(list_to_sort) // 2)
+        lower = [i for i in list_to_sort if i <= opornii]
         higher = [i for i in list_to_sort if i > opornii]
         return qsort(lower) + [opornii] + qsort(higher)
+
+
+def binary_search(sorted_list, item):
+    low = 0
+    high = len(sorted_list) - 1
+    guess = (low + high) // 2
+
+    while guess <= high:
+        if sorted_list[guess] == item:
+            return guess
+        elif sorted_list[guess] > item:
+            high = guess - 1
+            guess = (low + high) // 2
+        elif sorted_list[guess] < item:
+            low = guess + 1
+            guess = (low + high) // 2
 
 
 class TestSortingAlgorithms(unittest.TestCase):
@@ -52,8 +68,25 @@ class TestSortingAlgorithms(unittest.TestCase):
     def test_qsort_decending(self):
         self.assertEqual(qsort([96, 37, 14, 8, 3, -5]), [-5, 3, 8, 14, 37, 96])
 
+    def test_qsort_equal(self):
+        self.assertEqual(qsort([2,2,2,2]), [2,2,2,2])
+
     def test_qsort_empty(self):
         self.assertEqual(qsort([]), [])
+
+
+class TestSearchingAlgorithms(unittest.TestCase):
+    def test_binary_search(self):
+        self.assertEqual(binary_search(['a', 'b', 'c', 'd' ,'e', 'f'], 'c'), 2)
+
+    def test_binary_search_first(self):
+        self.assertEqual(binary_search(['a', 'b', 'c', 'd' ,'e', 'f'], 'a'), 0)
+
+    def test_binary_search_last(self):
+        self.assertEqual(binary_search(['a', 'b', 'c', 'd' ,'e', 'f'], 'f'), 5)
+
+    def test_binary_search_one_element(self):
+        self.assertEqual(binary_search(['a'], 'a'), 0)
 
 
 if __name__ == '__main__':
